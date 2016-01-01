@@ -1,7 +1,7 @@
 ## Reference XGB Implementation R
 #https://www.kaggle.com/tqchen/otto-group-product-classification-challenge/understanding-xgboost-model-on-otto-data/notebook
 library(xgboost)
-setwd("C:\\Users\\jswain1.HOMEOFFICE\\Documents\\kaggle\\Give me Some Credit")
+setwd("C:\\Users\\jeeban\\Documents\\kaggle\\Give me Some Credit")
 
 
 train<-read.csv("cs-training.csv")
