@@ -1,5 +1,5 @@
-# Kaggle-Code
-Give Me Some Credit
+#Give Me Some Credit  Kaggle R Code( Leader Board Rank ~16)
+
 About the competition
 
 "Give me some credit" is competition hosted by kaggle in Sept 20111. The objectice of the  competition 
