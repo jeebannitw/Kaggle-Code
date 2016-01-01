@@ -1,4 +1,4 @@
-#Give Me Some Credit  Kaggle R Code( Leader Board Rank ~16)
+#Give Me Some Credit  Kaggle R Code( Leader Board Rank below 30)
 
 About the competition
 
