@@ -20,8 +20,8 @@ sum(is.na(test)) # Missing values in test
 train[is.na(train)]<-999 ## replace missing values with 999
 test[is.na(test)]<-999 ## replace missing values with 999
 
-#train[,2:11]<-log(train[,2:11]+1) ## Take log tranformations of allfeatures for better performance -train 
-#test=log(test+1) ## Take log tranformations of allfeatures for better performance-test
+train[,2:11]<-log(train[,2:11]+1) ## Take log tranformations of allfeatures for better performance -train 
+test=log(test+1) ## Take log tranformations of allfeatures for better performance-test
 test_vars<-names(test) ## Test set variables 
 train_names<-names(train) ## train set variables ##
 common_vars<-intersect(test_vars,train_names) ## common variables set
