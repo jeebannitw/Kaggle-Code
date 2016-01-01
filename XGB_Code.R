@@ -4,6 +4,7 @@ library(xgboost)
 setwd("C:\\Users\\jeeban\\Documents\\kaggle\\Give me Some Credit") # Set the working Directory
 train<-read.csv("cs-training.csv") # Import train Data
 test<-read.csv("cs-test.csv") # Import Test data
+sample_submission<-read.csv("sampleEntry.csv")
 test$SeriousDlqin2yrs<-NULL ## To this Problem  Only ##(Drop Depedenet variable , as it is there is teseset)
 ## Missing value treatment #
 sum(is.na(train)) ## Missing values train 
@@ -13,7 +14,7 @@ train[is.na(train)]<-999 ## replace missing values with 999
 test[is.na(test)]<-999 ## replace missing values with 999
 
 train[,2:11]<-log(train[,2:11]+1) ## Take log tranformations of allfeatures for better performance -train 
-test[,2:11]=log(test[,2:11]) ## Take log tranformations of allfeatures for better performance-test
+test[,2:11]=log(test[,2:11]+1) ## Take log tranformations of allfeatures for better performance-test
 test_vars<-names(test) ## Test set variables 
 train_names<-names(train) ## train set variables ##
 common_vars<-intersect(test_vars,train_names) ## common variables set
@@ -69,7 +70,7 @@ pred1 <- predict(clf_best,testDataMatrix)
 pred = matrix(pred1, nrow=1)
 pred = data.frame(t(pred))
 names(pred)<-"Probability"
-pred$Id=test$id
-write.csv(pred,file="XGB_Basic_log_transformation.csv",row.names=F)
+pred$Id=sample_submission$Id
+write.csv(pred,file="XGB_Log_Transformation.csv",row.names=F)
 ###### Look at The Importance of Each variable ###
 importance_matrix <- xgb.importance(common_vars, model = clf_best)
