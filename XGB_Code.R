@@ -1,30 +1,24 @@
 ## Reference XGB Implementation R
 #https://www.kaggle.com/tqchen/otto-group-product-classification-challenge/understanding-xgboost-model-on-otto-data/notebook
 library(xgboost)
-setwd("C:\\Users\\jeeban\\Documents\\kaggle\\Give me Some Credit")
-
-
-train<-read.csv("cs-training.csv")
-test<-read.csv("cs-test.csv")
+setwd("C:\\Users\\jeeban\\Documents\\kaggle\\Give me Some Credit") # Set the working Directory
+train<-read.csv("cs-training.csv") # Import train Data
+test<-read.csv("cs-test.csv") # Import Test data
 test$SeriousDlqin2yrs<-NULL ## To this Problem  Only ##(Drop Depedenet variable , as it is there is teseset)
 ## Missing value treatment #
 sum(is.na(train)) ## Missing values train 
-sum(is.na(test))
+sum(is.na(test)) # Missing values in test
 
 train[is.na(train)]<-999 ## replace missing values with 999
 test[is.na(test)]<-999 ## replace missing values with 999
 
-train[,2:11]<-log(train[,2:11]+1)
-#train<-cbind(train,log(train[,2:11]+1))
-test_vars<-names(test)
-train_names<-names(train)
-common_vars<-intersect(test_vars,train_names)
-#all_data<-do.call(rbind,list(train[common_vars],test[common_vars]))
-#unq_values<-data.frame(unique_values=apply(train,2,function(x) length(unique(x))))
+train[,2:11]<-log(train[,2:11]+1) ## Take log tranformations of allfeatures for better performance -train 
+test[,2:11]=log(test[,2:11]) ## Take log tranformations of allfeatures for better performance-test
+test_vars<-names(test) ## Test set variables 
+train_names<-names(train) ## train set variables ##
+common_vars<-intersect(test_vars,train_names) ## common variables set
 
-## Data Transformation converting categorical features to integer#
-#min_unq_values<-2
-
+## Convert categorical features into numerical features ##
 for (f in common_vars) {
   if (class(train[[f]]) == "character"){
     levels <- unique(c(train[[f]], test[[f]]))
@@ -33,27 +27,18 @@ for (f in common_vars) {
   }
 }
 
-######  END #######################
-
-
-########## Event Rate Features ####
 all_train<-xgb.DMatrix(data=data.matrix(train[common_vars]),label=(train[,c("SeriousDlqin2yrs")]))
-
-#watchlist<-list(val=dval,train=dtrain)
-
-
-#######  Get the Best Model Parameters ####
-
+#######  Set the Model Parameters ####
 param <- list(objective           = "binary:logistic", 
               booster = "gbtree",
-              eta                 = 0.01, # 0.06, #0.01,
+              eta                 = 0.01, # 0.06, #0.01,0.005
               max_depth           = 20, #changed from default of 4,6,8,10,15,20
               subsample           = 0.5, #(.5,0.7,1)
               colsample_bytree    = 0.5, #(.5,0.7,1)
               min_child_weight=44.8833  ## 3/ Event rate - Rule of Thumb 
               
 )
-
+## Train the model with 3 fold cross validation 
 clf <- xgb.cv(params              = param, 
               data                = all_train, 
               nrounds             = 2000, #300, #280, #125, #250, # changed from 300
@@ -63,10 +48,8 @@ clf <- xgb.cv(params              = param,
               maximize            = FALSE,
               eval_metric="auc",
               nfold=3
-)
-
+              )
 ####################
-
 ###### Use the entire training set using best parameters 
 clf_best <- xgboost(params        = param, 
                     data                = all_train, 
@@ -77,11 +60,9 @@ clf_best <- xgboost(params        = param,
                     maximize            = FALSE,
                     eval_metric="auc"
                     #nfold=3
+                    )
                     
-)
 
-names(test)
-test[,2:11]=log(test[,2:11])
 
 testDataMatrix<-xgb.DMatrix(data=data.matrix(test[,common_vars]))
 pred1 <- predict(clf_best,testDataMatrix)
@@ -90,6 +71,5 @@ pred = data.frame(t(pred))
 names(pred)<-"Probability"
 pred$Id=test$id
 write.csv(pred,file="XGB_Basic_log_transformation.csv",row.names=F)
-
 ###### Look at The Importance of Each variable ###
 importance_matrix <- xgb.importance(common_vars, model = clf_best)
