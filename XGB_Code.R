@@ -81,7 +81,7 @@ clf_best <- xgboost(params        = param,
 )
 
 names(test)
-test[,2:11]=log(test[,2:11]+1)
+test[,2:11]=log(test[,2:11])
 
 testDataMatrix<-xgb.DMatrix(data=data.matrix(test[,common_vars]))
 pred1 <- predict(clf_best,testDataMatrix)
